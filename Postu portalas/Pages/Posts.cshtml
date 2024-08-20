@@ -1,0 +1,432 @@
+﻿@page
+@using PostuPortalas.Core.Models
+@model Postu_portalas.Pages.PostsModel
+@{
+}
+
+<style>
+    body {
+        background-image: url('https://www.shutterstock.com/image-vector/social-media-sketch-vector-seamless-600nw-1660950727.jpg');
+        background-color: rgba(255, 255, 255, 0.486);
+        background-blend-mode: overlay;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+
+    table.roundedCorners1 {
+        border: 1px solid DarkOrange;
+        border-radius: 13px;
+        background-color: lightcyan;
+        border-collapse: separate;
+    }
+
+    table.roundedCorners2 {
+        border: 1px solid DarkOrange;
+        border-radius: 13px;
+        background-color: lightcyan;
+        border-collapse: separate;
+        padding-bottom: 2em;
+        padding-top: 2em;
+    }
+
+    table.roundedCorners2:hover {
+        overflow: visible;
+    }
+</style>
+
+<div>
+    <button type="button" id="show-users-button" onclick="showUser()">Show users</button>
+    <button type="button" id="add-user-button" onclick="addUser()">Add user</button>
+    <button type="button" id="update-user-button" onclick="updateUser()">Edit user</button>
+    <button type="button" id="delete-user-button" onclick="deleteUser()">Delete User</button>
+    <button type="button" id="add-post-button" onclick="addPost()">Add post</button>
+    <button type="button" id="update-post-button" onclick="updatePost()">Edit post</button>
+    <button type="button" id="delete-post-button" onclick="deletePost()">Delete post</button>
+</div>
+<br>
+<br>
+
+<table id="users-table" style="display:none">
+    <tr>
+        <td>User ID</td>
+        <td>User Name</td>
+        <td>User Email</td>
+    </tr>
+    @foreach (User user in Model.Users)
+    {
+        <tr>
+            <td>@user.Id</td>
+            <td>@user.Name</td>
+            <td>@user.Email</td>
+        </tr>
+    }
+</table>
+
+<form id="add-user-form" style="display:none">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="text" id="email" name="email" required><br><br>
+
+    <button type="submit" id="add-user-submit">Add User</button>
+</form>
+
+<form id="update-user-form" style="display:none">
+    <label for="id">User ID:</label><br>
+    <input type="number" id="id" name="id" required><br><br>
+
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="text" id="email" name="email" required><br><br>
+
+    <button type="submit" id="update-user-submit">Update User</button>
+</form>
+
+<form id="delete-user-form" style="display:none">
+    <label for="id">User ID:</label><br>
+    <input type="number" id="id" name="id" required><br><br>
+
+    <button type="submit" id="delete-user-submit">Delete User</button>
+</form>
+
+<form id="add-post-form" style="display:none">
+    <label for="id">User ID:</label><br>
+    <input type="number" id="id" name="id" required><br><br>
+
+    <label for="title">Title:</label><br>
+    <textarea cols="66" type="text" maxlength="100" id="title" name="title" required></textarea><br><br>
+
+    <label for="content">Content:</label><br>
+    <textarea rows ="15" cols="99" type="text" maxlength="2000" id="content" name="content" required></textarea><br><br>
+
+    <button type="submit" id="add-post-submit">Add Post</button>
+</form>
+
+<form id="update-post-form" style="display:none">
+    <label for="id">Post ID:</label><br>
+    <input type="number" id="id" name="id" required><br><br>
+
+    <label for="title">Title:</label><br>
+    <textarea cols="66" type="text" maxlength="100" id="title" name="title" required></textarea><br><br>
+
+    <label for="content">Content:</label><br>
+    <textarea rows="15" cols="99" type="text" maxlength="2000" id="content" name="content" required></textarea><br><br>
+
+    <button type="submit" id="update-post-submit">Update Post</button>
+</form>
+
+<form id="delete-post-form" style="display:none">
+    <label for="id">Post ID:</label><br>
+    <input type="number" id="id" name="id" required><br><br>
+
+    <button type="submit" id="delete-post-submit">Delete Post</button>
+</form>
+
+<br>
+<br>
+<table class="roundedCorners1" style="width:100%">
+    @foreach (Post post in Model.Posts)
+    {
+        <tr>
+            <td>
+                <table class="roundedCorners2" style="width:100%">
+                    <tr>
+                        <td>Post ID: @post.Id</td>
+                    </tr>
+                    <tr>
+                        <td><br>@post.TheUser.Name<br>@post.TimeStamp</td>
+                    </tr>
+                    <tr>
+                        <td><br><b>@post.Title</b></td>
+                    </tr>
+                    <tr>
+                        <td><br>@post.Content</td>
+                    </tr>
+                </table>
+            </td>
+    </tr>
+    }
+</table>
+
+<script>
+
+    function disableButtons() {
+        document.getElementById('show-users-button').style.background = "initial";
+        document.getElementById('add-user-button').style.background = "initial";
+        document.getElementById('update-user-button').style.background = "initial";
+        document.getElementById('delete-user-button').style.background = "initial";
+        document.getElementById('add-post-button').style.background = "initial";
+        document.getElementById('update-post-button').style.background = "initial";
+        document.getElementById('delete-post-button').style.background = "initial";
+        document.getElementById('users-table').style = "display:none";
+        document.getElementById('add-user-form').style = "display:none";
+        document.getElementById('update-user-form').style = "display:none";
+        document.getElementById('delete-user-form').style = "display:none";
+        document.getElementById('add-post-form').style = "display:none";
+        document.getElementById('update-post-form').style = "display:none";
+        document.getElementById('delete-post-form').style = "display:none";
+        document.getElementById('users-table').style = "display:none";
+    }
+
+    function showUser() {
+        disableButtons();
+        document.getElementById('show-users-button').style.background = '#12ff00';
+        document.getElementById('users-table').style = "display:initial";
+    }
+
+    function addUser() {
+        disableButtons();
+        document.getElementById('add-user-button').style.background = '#12ff00';
+        document.getElementById('add-user-form').style = "display:initial";
+    }
+
+    function updateUser() {
+        disableButtons();
+        document.getElementById('update-user-button').style.background = '#12ff00';
+        document.getElementById('update-user-form').style = "display:initial";
+    }
+
+    function deleteUser() {
+        disableButtons();
+        document.getElementById('delete-user-button').style.background = '#12ff00';
+        document.getElementById('delete-user-form').style = "display:initial";
+    }
+
+    function addPost() {
+        disableButtons();
+        document.getElementById('add-post-button').style.background = '#12ff00';
+        document.getElementById('add-post-form').style = "display:initial";
+    }
+
+    function updatePost() {
+        disableButtons();
+        document.getElementById('update-post-button').style.background = '#12ff00';
+        document.getElementById('update-post-form').style = "display:initial";
+    }
+
+    function deletePost() {
+        disableButtons();
+        document.getElementById('delete-post-button').style.background = '#12ff00';
+        document.getElementById('delete-post-form').style = "display:initial";
+    }
+
+    function addUserFormData(endpoint, formData) {
+        const plainFormData = Object.fromEntries(formData.entries());
+        const jsonString = JSON.stringify(plainFormData);
+        var submitButton = document.getElementById('add-user-submit');
+        submitButton.innerText = 'User is being added, please wait';
+        submitButton.style.background = '#12ff00';
+        fetch(endpoint, {
+            method: 'POST',
+            body: jsonString,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                alert('User was successfully added');
+                window.location.href = '/Posts'
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    document.getElementById('add-user-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const endpoint = 'https://localhost:7059/Post/AddUserJSON';
+        const formData = new FormData(this);
+        addUserFormData(endpoint, formData);
+    });
+
+    function updateUserFormData(endpoint, formData) {
+        const plainFormData = Object.fromEntries(formData.entries());
+        const jsonString = JSON.stringify(plainFormData);
+        var submitButton = document.getElementById('update-user-submit');
+        submitButton.innerText = 'User is being updatet, please wait';
+        submitButton.style.background = '#12ff00';
+        fetch(endpoint, {
+            method: 'PATCH',
+            body: jsonString,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                alert('User was successfully updated');
+                window.location.href = '/Posts'
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    document.getElementById('update-user-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const endpoint = 'https://localhost:7059/Post/UpdateUserJSON';
+        const formData = new FormData(this);
+        updateUserFormData(endpoint, formData);
+    });
+
+    function deleteUserFormData(endpoint, formData) {
+        const plainFormData = Object.fromEntries(formData.entries());
+        const jsonString = JSON.stringify(plainFormData);
+        var submitButton = document.getElementById('delete-user-submit');
+        submitButton.innerText = 'User is being deleted, please wait';
+        submitButton.style.background = '#12ff00';
+        fetch(endpoint, {
+            method: 'DELETE',
+            body: jsonString,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                alert('User was successfully deleted');
+                window.location.href = '/Posts'
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    document.getElementById('delete-user-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const endpoint = 'https://localhost:7059/Post/DeleteUserJSON';
+        const formData = new FormData(this);
+        deleteUserFormData(endpoint, formData);
+    });
+
+    function addPostFormData(endpoint, formData) {
+        const plainFormData = Object.fromEntries(formData.entries());
+        const jsonString = JSON.stringify(plainFormData);
+        var submitButton = document.getElementById('add-post-submit');
+        submitButton.innerText = 'Post is being added, please wait';
+        submitButton.style.background = '#12ff00';
+        fetch(endpoint, {
+            method: 'POST',
+            body: jsonString,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                alert('Post was successfully added');
+                window.location.href = '/Posts'
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    document.getElementById('add-post-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const endpoint = 'https://localhost:7059/Post/AddPostJSON';
+        const formData = new FormData(this);
+        addPostFormData(endpoint, formData);
+    });
+
+    function updatePostFormData(endpoint, formData) {
+        const plainFormData = Object.fromEntries(formData.entries());
+        const jsonString = JSON.stringify(plainFormData);
+        var submitButton = document.getElementById('update-post-submit');
+        submitButton.innerText = 'Post is being updatet, please wait';
+        submitButton.style.background = '#12ff00';
+        fetch(endpoint, {
+            method: 'PATCH',
+            body: jsonString,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                alert('Post was successfully updated');
+                window.location.href = '/Posts'
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    document.getElementById('update-post-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const endpoint = 'https://localhost:7059/Post/UpdatePostJSON';
+        const formData = new FormData(this);
+        updatePostFormData(endpoint, formData);
+    });
+
+    function deletePostFormData(endpoint, formData) {
+        const plainFormData = Object.fromEntries(formData.entries());
+        const jsonString = JSON.stringify(plainFormData);
+        var submitButton = document.getElementById('delete-post-submit');
+        submitButton.innerText = 'Post is being deleted, please wait';
+        submitButton.style.background = '#12ff00';
+        fetch(endpoint, {
+            method: 'DELETE',
+            body: jsonString,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                alert('Post was successfully deleted');
+                window.location.href = '/Posts'
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    document.getElementById('delete-post-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const endpoint = 'https://localhost:7059/Post/DeletePostJSON';
+        const formData = new FormData(this);
+        deletePostFormData(endpoint, formData);
+    });
+</script>

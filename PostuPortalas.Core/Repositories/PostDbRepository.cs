@@ -87,7 +87,7 @@ namespace PostuPortalas.Core.Repositories
             List<User> users = new List<User>();
             using (var context = new MyDbContext())
             {
-                users = context.Users.Where(x => x.Name == user.Name && x.Email == user.Email).ToList();
+                users = context.Users.Where(x => x.Name.ToLower() == user.Name.ToLower() || x.Email == user.Email).ToList();
             }
             return Task.FromResult(users.ToList().Count > 0);
         }

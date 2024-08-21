@@ -1,5 +1,6 @@
 ﻿@page
 @using PostuPortalas.Core.Models
+@using System.Text.Json
 @model Postu_portalas.Pages.PostsModel
 @{
 }
@@ -33,6 +34,10 @@
     table.roundedCorners2:hover {
         overflow: visible;
     }
+
+    #pagination {
+        text-align: center;
+    }
 </style>
 
 <div>
@@ -43,6 +48,7 @@
     <button type="button" id="add-post-button" onclick="addPost()">Add post</button>
     <button type="button" id="update-post-button" onclick="updatePost()">Edit post</button>
     <button type="button" id="delete-post-button" onclick="deletePost()">Delete post</button>
+    <button type="button" id="search-button" onclick="search()">Search</button>
 </div>
 <br>
 <br>
@@ -126,33 +132,86 @@
     <button type="submit" id="delete-post-submit">Delete Post</button>
 </form>
 
+<form id="search-form" style="display:none">
+    <label for="query">Find:</label><br>
+    <input type="text" id="query" name="query" required><br><br>
+
+    <button type="submit" id="search-submit">Search</button>
+</form>
+
 <br>
 <br>
-<table class="roundedCorners1" style="width:100%">
-    @foreach (Post post in Model.Posts)
-    {
-        <tr>
-            <td>
-                <table class="roundedCorners2" style="width:100%">
-                    <tr>
-                        <td>Post ID: @post.Id</td>
-                    </tr>
-                    <tr>
-                        <td><br>@post.TheUser.Name<br>@post.TimeStamp</td>
-                    </tr>
-                    <tr>
-                        <td><br><b>@post.Title</b></td>
-                    </tr>
-                    <tr>
-                        <td><br>@post.Content</td>
-                    </tr>
-                </table>
-            </td>
-    </tr>
-    }
+<table class="roundedCorners1" id="posts-table" style="width:100%">
 </table>
+<div id="pagination"></div>
 
 <script>
+
+    var posts = @Html.Raw(JsonSerializer.Serialize(Model.Posts));
+    const searchParams = new URLSearchParams(window.location.search);
+    const bSearchData = searchParams.has('query');
+    const searchData = searchParams.get('query');
+
+    const rowsPerPage = 5;
+    let currentPage = 1;
+
+    function displayTable(page) {
+        const table = document.getElementById("posts-table");
+        const startIndex = (page - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        var slicedPosts = posts.slice(startIndex, endIndex);
+
+        table.innerHTML = ``;
+
+        slicedPosts.forEach(item => {
+            if (bSearchData && item.Title.toLowerCase().search(searchData.toLowerCase()) == -1 && item.Content.toLowerCase().search(searchData.toLowerCase()) == -1) { }
+            else {
+                table.innerHTML +=
+                    `<tr>
+                    <td>
+                        <table class="roundedCorners2"" style="width: 100 %"">
+                            <tr>
+                                <td>Post ID: ` + item.Id + `</td>
+                            </tr>
+                            <tr>
+                                <td><br>` + item.TheUser.Name + `<br>` + new Date(Date.parse(item.TimeStamp)) + `</td>
+                            </tr>
+                            <tr>
+                                <td><br><b>` + item.Title + `</b></td >
+                            </tr>
+                            <tr>
+                                <td><br>` + item.Content + `</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>`;
+            }
+        });
+
+        updatePagination(page);
+    }
+
+    function updatePagination(currentPage) {
+        const pageCount = Math.ceil(posts.length / rowsPerPage);
+        const paginationContainer = document.getElementById("pagination");
+        paginationContainer.innerHTML = "";
+
+        for (let i = 1; i <= pageCount; i++) {
+            const pageLink = document.createElement("a");
+            pageLink.href = "#";
+            pageLink.innerText = i;
+            pageLink.onclick = function () {
+                displayTable(i);
+            };
+            if (i === currentPage) {
+                pageLink.style.fontWeight = "bold";
+            }
+            paginationContainer.appendChild(pageLink);
+            paginationContainer.appendChild(document.createTextNode(" "));
+        }
+    }
+
+    displayTable(currentPage);
 
     function disableButtons() {
         document.getElementById('show-users-button').style.background = "initial";
@@ -162,6 +221,7 @@
         document.getElementById('add-post-button').style.background = "initial";
         document.getElementById('update-post-button').style.background = "initial";
         document.getElementById('delete-post-button').style.background = "initial";
+        document.getElementById('search-button').style.background = "initial";
         document.getElementById('users-table').style = "display:none";
         document.getElementById('add-user-form').style = "display:none";
         document.getElementById('update-user-form').style = "display:none";
@@ -169,7 +229,7 @@
         document.getElementById('add-post-form').style = "display:none";
         document.getElementById('update-post-form').style = "display:none";
         document.getElementById('delete-post-form').style = "display:none";
-        document.getElementById('users-table').style = "display:none";
+        document.getElementById('search-form').style = "display:none";
     }
 
     function showUser() {
@@ -212,6 +272,12 @@
         disableButtons();
         document.getElementById('delete-post-button').style.background = '#12ff00';
         document.getElementById('delete-post-form').style = "display:initial";
+    }
+
+    function search() {
+        disableButtons();
+        document.getElementById('search-button').style.background = '#12ff00';
+        document.getElementById('search-form').style = "display:initial";
     }
 
     function addUserFormData(endpoint, formData) {
